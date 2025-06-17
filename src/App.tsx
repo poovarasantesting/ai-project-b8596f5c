@@ -1,23 +1,19 @@
-import { Toaster } from "@/components/ui/toaster";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomePage from "@/pages/HomePage";
-import AboutPage from "@/pages/AboutPage";
-import ProjectsPage from "@/pages/ProjectsPage";
-import ContactPage from "@/pages/ContactPage";
-import { Layout } from "@/components/Layout";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import { Toaster } from "./components/ui/toaster";
 
-export default function App() {
+function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
       <Toaster />
     </BrowserRouter>
   );
 }
+
+export default App;
