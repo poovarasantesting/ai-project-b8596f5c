@@ -1,124 +1,57 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { BarChart, CalendarDays, CreditCard, DollarSign, LogOut, Users } from "lucide-react";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/lib/auth';
+import { Button } from '@/components/ui/button';
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [user, setUser] = useState<{ email: string } | null>(null);
-
+  const { user, isAuthenticated, logout } = useAuthStore();
+  
+  // Protect route - redirect to login if not authenticated
   useEffect(() => {
-    // Check if user is authenticated
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
-    const userData = localStorage.getItem("user");
-    
     if (!isAuthenticated) {
-      navigate("/login");
-      return;
+      navigate('/login');
     }
-    
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, [navigate]);
+  }, [isAuthenticated, navigate]);
 
+  // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("user");
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    navigate("/login");
+    logout();
+    navigate('/login');
   };
 
-  // Mock dashboard data
-  const dashboardStats = [
-    { title: "Total Revenue", value: "$45,231.89", icon: DollarSign, trend: "+20.1%" },
-    { title: "Subscriptions", value: "2,350", icon: Users, trend: "+10.1%" },
-    { title: "Sales", value: "12,234", icon: CreditCard, trend: "+35.1%" },
-    { title: "Active Users", value: "573", icon: Users, trend: "+5.1%" },
-  ];
-
-  if (!user) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  // If not authenticated, don't render the dashboard content
+  if (!isAuthenticated || !user) {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">Welcome, {user.email}</span>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {dashboardStats.map((stat, index) => (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-green-500 mt-1">{stat.trend} from last month</p>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <Button variant="outline" onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your activity for the last 30 days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[200px] flex items-center justify-center border rounded-md">
-                <div className="flex flex-col items-center text-muted-foreground">
-                  <BarChart className="h-12 w-12 mb-2" />
-                  <p>Activity chart would go here</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Welcome, {user.name}!</h2>
+          <p className="text-gray-600">
+            This is your personal dashboard. You are logged in with: {user.email}
+          </p>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Upcoming Events</CardTitle>
-              <CardDescription>Your schedule for the next 7 days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[1, 2, 3].map((_, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <CalendarDays className="h-5 w-5 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="font-medium">Team Meeting</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(Date.now() + i * 86400000).toLocaleDateString()} at 10:00 AM
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mt-8 border-t pt-6">
+            <h3 className="text-lg font-medium mb-4">What you can do:</h3>
+            <ul className="space-y-2 list-disc pl-5">
+              <li>Update your profile information</li>
+              <li>Manage your account settings</li>
+              <li>View your activity history</li>
+              <li>Explore available features</li>
+            </ul>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
