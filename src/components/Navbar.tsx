@@ -1,74 +1,37 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useCart } from "@/context/CartContext";
+import { Badge } from "@/components/ui/badge";
 
-export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Projects", path: "/projects" },
-    { name: "Contact", path: "/contact" },
-  ];
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+export default function Navbar() {
+  const { getTotalItems } = useCart();
+  const itemCount = getTotalItems();
 
   return (
-    <header className="border-b bg-background sticky top-0 z-50">
-      <div className="container flex items-center justify-between h-16 mx-auto px-4 sm:px-6">
-        <Link to="/" className="font-bold text-2xl">
-          Portfolio
+    <header className="bg-white shadow">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link to="/" className="text-2xl font-bold text-gray-800">
+          ShopCart
         </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex space-x-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`font-medium transition-colors hover:text-primary ${
-                location.pathname === item.path ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
+        
+        <nav className="flex items-center gap-6">
+          <Link to="/" className="text-gray-600 hover:text-gray-900">
+            Products
+          </Link>
+          
+          <Link to="/cart" className="relative">
+            <Button variant="outline" size="icon">
+              <ShoppingCart className="h-5 w-5" />
+              {itemCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 px-2 py-1 text-xs">
+                  {itemCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
         </nav>
-
-        {/* Mobile Navigation Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </Button>
       </div>
-
-      {/* Mobile Navigation Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden py-4 px-4 bg-background border-b">
-          <nav className="flex flex-col space-y-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`font-medium transition-colors hover:text-primary ${
-                  location.pathname === item.path ? "text-primary" : "text-muted-foreground"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
     </header>
   );
 }

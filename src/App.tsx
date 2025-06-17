@@ -1,19 +1,31 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import RegisterPage from '@/pages/Register';
-import LoginPage from '@/pages/Login';
-import DashboardPage from '@/pages/Dashboard';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import Navbar from "@/components/Navbar";
+import ProductsPage from "@/pages/ProductsPage";
+import CartPage from "@/pages/CartPage";
+import { CartProvider } from "@/context/CartContext";
+
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-      </Routes>
-      <Toaster />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <CartProvider>
+        <BrowserRouter>
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <main className="container mx-auto py-8 px-4">
+              <Routes>
+                <Route path="/" element={<ProductsPage />} />
+                <Route path="/cart" element={<CartPage />} />
+              </Routes>
+            </main>
+            <Toaster />
+          </div>
+        </BrowserRouter>
+      </CartProvider>
+    </QueryClientProvider>
   );
 }
